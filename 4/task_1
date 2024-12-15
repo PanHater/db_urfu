@@ -1,0 +1,108 @@
+-- Получение данных из таблицы authors
+SELECT au_id, au_lname, au_fname FROM authors;
+-- Возвращает идентификаторы, фамилии и имена всех авторов.
+
+-- Присваивание имен столбцам в результате
+SELECT au_id AS идентификатор, au_lname AS фамилия, au_fname AS имя FROM authors;
+-- Столбцы результата имеют новые имена: идентификатор, фамилия, имя.
+
+-- Пример использования нестандартного имени столбца (может вызвать ошибку в некоторых СУБД)
+SELECT au_id AS идентификатор, 'фамилия автора' = au_lname, au_fname AS имя FROM authors;
+-- Вероятно, вызовет ошибку из-за строки как имени столбца.
+
+-- Вывод цены из titles с префиксом
+SELECT 'Цена ($)= ', price FROM titles;
+-- Показывает цены книг с дополнительным текстом.
+
+-- Фильтрация авторов по городу
+SELECT au_id AS id, au_lname AS name, au_fname AS fullname FROM authors WHERE city = 'Oakland';
+-- Возвращает авторов из города Oakland.
+
+-- Уточнение имени таблицы для выбора столбцов
+SELECT authors.au_id AS id, authors.au_lname AS фамилия, authors.au_fname AS имя FROM authors WHERE city = 'Oakland';
+-- Аналогично предыдущему запросу, но явно указаны имена таблиц.
+
+-- Вычисление новой цены с увеличением на 15%
+SELECT title_id, price, new_price = price * 1.15 FROM titles WHERE advance >= 5000;
+-- Возвращает идентификатор книги, текущую цену и новую цену для книг с авансом ≥ $5000.
+
+-- Обработка NULL в вычислениях
+SELECT title_id, ytd_sales, '2*ytd' = 2 * ytd_sales FROM titles;
+SELECT title_id, ytd_sales, price * ytd_sales FROM titles;
+-- Демонстрирует, что умножение NULL возвращает NULL.
+
+-- Простое соединение двух таблиц (декартово произведение)
+SELECT * FROM titles, sales;
+-- Каждая строка из titles соединяется с каждой строкой из sales.
+
+-- Соединение таблиц с фильтрацией
+SELECT * FROM titles, sales WHERE titles.title_id = sales.title_id AND titles.title_id = 'PS2106';
+-- Возвращает строки, где идентификаторы title_id совпадают, только для книги 'PS2106'.
+
+-- INNER JOIN для расчета дохода
+SELECT titles.title_id, stor_id, qty * price FROM titles
+INNER JOIN sales ON titles.title_id = sales.title_id
+WHERE titles.title_id = 'PS2106';
+-- Соединяет строки, где идентификаторы совпадают, и вычисляет общий доход.
+
+-- LEFT OUTER JOIN возвращает все строки из titles
+SELECT titles.title_id, stor_id, qty * price FROM titles
+LEFT OUTER JOIN sales ON titles.title_id = sales.title_id;
+-- Все строки из titles, даже если в sales нет совпадений.
+
+-- FULL OUTER JOIN возвращает строки из обеих таблиц
+SELECT titles.title_id, stor_id, qty * price FROM titles
+FULL OUTER JOIN sales ON titles.title_id = sales.title_id;
+-- Показывает все строки из обеих таблиц, включая те, где нет совпадений.
+
+-- Группировка и уникальность
+SELECT au_id FROM titleauthor;
+SELECT DISTINCT au_id FROM titleauthor;
+SELECT COUNT(*) FROM titleauthor;
+SELECT COUNT(DISTINCT au_id) FROM titleauthor;
+-- Первая команда возвращает все авторы, вторая – только уникальные, третья – общее число строк, четвертая – число уникальных авторов.
+
+-- Запросы к системным таблицам
+SELECT syscolumns.name, sysobjects.name FROM syscolumns, sysobjects 
+WHERE sysobjects.id = syscolumns.id AND sysobjects.type = 'U';
+-- Возвращает имена столбцов и таблиц для всех пользовательских таблиц.
+
+-- Пример использования фильтров и математических операций
+SELECT title_id, ytd_sales, 'advance*2' = advance * 2, 'price*ytd_sales' = price * ytd_sales 
+FROM titles WHERE advance * 2 > ytd_sales * price;
+-- Возвращает книги, где удвоенный аванс больше, чем продажи * цена.
+
+SELECT title_id, ytd_sales, price * ytd_sales FROM titles WHERE ytd_sales BETWEEN 4095 AND 12000;
+-- Показывает книги, где продажи находятся в указанном диапазоне.
+
+-- Фильтрация по строкам
+SELECT id = au_id, name = au_lname, Штат = state FROM authors WHERE state BETWEEN 'CA' AND 'IN';
+SELECT id = au_id, name = au_lname, state = state FROM authors WHERE state NOT BETWEEN 'CA' AND 'IN';
+SELECT id = au_id, name = au_lname, state = state FROM authors WHERE state IN ('CA', 'IN', 'MD');
+-- Различные формы фильтрации по полю state.
+
+-- LIKE и работа с шаблонами
+SELECT name = au_lname AS Фамилия, au_fname AS Имя, Телефон = phone FROM authors WHERE phone LIKE '415%';
+SELECT id = au_id, name = au_lname, phone = phone FROM authors WHERE phone NOT LIKE '415%';
+SELECT id = au_id, name = au_lname, phone = phone FROM authors WHERE phone LIKE '4_5%';
+SELECT id = au_id, name = au_lname, phone = phone FROM authors WHERE phone LIKE '[2-7]1[2-9]%';
+SELECT id = au_id, name = au_lname, phone = phone FROM authors WHERE phone LIKE '[^2-7]1[2-9]%';
+-- Демонстрируют работу с шаблонами и диапазонами символов.
+
+-- Работа с NULL
+SELECT title_id, type, advance FROM titles WHERE advance IS NULL;
+SELECT title_id, type, advance FROM titles WHERE advance IS NOT NULL;
+SELECT title_id, type, advance FROM titles WHERE advance > 0;
+-- Показывает строки с NULL, без NULL и где advance > 0.
+
+-- INTO: создание новой таблицы
+SELECT title_id, title INTO NEW_TITLES FROM titles;
+-- Создает новую таблицу NEW_TITLES с копией данных из titles.
+
+SELECT title_id, title INTO #NEW_TITLES FROM titles;
+-- Создает временную таблицу #NEW_TITLES с данными из titles.
+
+SELECT * FROM NEW_TITLES;
+SELECT * FROM #NEW_TITLES;
+DROP TABLE NEW_TITLES;
+-- Показывает данные из постоянной и временной таблицы, затем удаляет постоянную.

@@ -1,0 +1,5 @@
+SELECT DISTINCT authors.*
+FROM authors
+INNER JOIN titleauthor ON authors.au_id = titleauthor.au_id
+INNER JOIN titles ON titleauthor.title_id = titles.title_id
+WHERE titles.title ILIKE '%Comp%';

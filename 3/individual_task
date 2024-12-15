@@ -1,0 +1,19 @@
+-- 1. Вставка авторов
+INSERT INTO authors (au_id, au_lname, au_fname, phone, address, city, state, zip, contract)
+VALUES
+('123-45-6789', 'Каратыгин', 'С', 'UNKNOWN', 'Москва', 'Москва', 'MO', '12345', TRUE),
+('987-65-4321', 'Тихонов', 'А', 'UNKNOWN', 'Питер', 'С-Петербург', 'SP', '54321', TRUE);
+-- 2. Вставка книги
+INSERT INTO titles (title_id, title, type, pub_id, price, advance, royalty, ytd_sales, notes, pubdate)
+VALUES
+('RF2000', 'Работа в Visual FoxPro на примерах', 'business', NULL, NULL, NULL, NULL, NULL, NULL, '2000-06-15');
+-- 3. Вставка связи между авторами и книгой
+INSERT INTO titleauthor (au_id, title_id, au_ord, royaltyper)
+VALUES
+('123-45-6789', 'RF2000', 1, 50),
+('987-65-4321', 'RF2000', 2, 50);
+-- 4. Вставка информации о продажах книги
+INSERT INTO sales (stor_id, ord_num, ord_date, qty, payterms, title_id)
+VALUES
+('STORE1', 'ORD12345', '2024-12-01', 100, 'COD', 'RF2000'),
+('STORE2', 'ORD12346', '2024-12-02', 150, 'COD', 'RF2000');

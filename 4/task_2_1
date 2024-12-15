@@ -1,0 +1,4 @@
+SELECT COUNT(DISTINCT titleauthor.title_id) AS количество_изданий
+FROM authors
+INNER JOIN titleauthor ON authors.au_id = titleauthor.au_id
+WHERE authors.au_lname ILIKE 'Тихонов%' OR authors.au_lname ILIKE 'Тихонова%';

@@ -1,0 +1,5 @@
+SELECT DISTINCT titles.*
+FROM titles
+INNER JOIN titleauthor ON titles.title_id = titleauthor.title_id
+INNER JOIN authors ON titleauthor.au_id = authors.au_id
+WHERE authors.contract = TRUE;

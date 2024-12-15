@@ -1,0 +1,100 @@
+-- Table: public.authors
+
+-- DROP TABLE IF EXISTS public.authors;
+
+CREATE TABLE IF NOT EXISTS public.authors
+(
+    au_id character varying(11) COLLATE pg_catalog."default" NOT NULL,
+    au_lname character varying(40) COLLATE pg_catalog."default" NOT NULL,
+    au_fname character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    phone character varying(12) COLLATE pg_catalog."default" NOT NULL DEFAULT 'UNKNOWN'::character varying,
+    address character varying(40) COLLATE pg_catalog."default",
+    city character varying(20) COLLATE pg_catalog."default",
+    state character varying(2) COLLATE pg_catalog."default",
+    zip character varying(5) COLLATE pg_catalog."default",
+    contract boolean NOT NULL,
+    CONSTRAINT authors_pkey PRIMARY KEY (au_id),
+    CONSTRAINT chk_au_id CHECK (au_id::text ~ '^[0-9]{3}-[0-9]{2}-[0-9]{4}$'::text),
+    CONSTRAINT chk_zip CHECK (zip::text ~ '^[0-9]{5}$'::text)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.authors
+    OWNER to postgres;
+
+-- Table: public.sales
+
+-- DROP TABLE IF EXISTS public.sales;
+
+CREATE TABLE IF NOT EXISTS public.sales
+(
+    stor_id character(4) COLLATE pg_catalog."default" NOT NULL,
+    ord_num character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    ord_date timestamp without time zone NOT NULL,
+    qty smallint NOT NULL,
+    payterms character varying(12) COLLATE pg_catalog."default",
+    title_id character varying(6) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT sales_pkey PRIMARY KEY (stor_id, ord_num, title_id),
+    CONSTRAINT sales_title_id_fkey FOREIGN KEY (title_id)
+        REFERENCES public.titles (title_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.sales
+    OWNER to postgres;
+
+
+-- Table: public.titleauthor
+
+-- DROP TABLE IF EXISTS public.titleauthor;
+
+CREATE TABLE IF NOT EXISTS public.titleauthor
+(
+    au_id character varying(11) COLLATE pg_catalog."default" NOT NULL,
+    title_id character varying(6) COLLATE pg_catalog."default" NOT NULL,
+    au_ord smallint,
+    royaltyper integer,
+    CONSTRAINT titleauthor_pkey PRIMARY KEY (au_id, title_id),
+    CONSTRAINT titleauthor_au_id_fkey FOREIGN KEY (au_id)
+        REFERENCES public.authors (au_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT titleauthor_title_id_fkey FOREIGN KEY (title_id)
+        REFERENCES public.titles (title_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.titleauthor
+    OWNER to postgres;
+
+
+-- Table: public.titles
+
+-- DROP TABLE IF EXISTS public.titles;
+
+CREATE TABLE IF NOT EXISTS public.titles
+(
+    title_id character varying(6) COLLATE pg_catalog."default" NOT NULL,
+    title character varying(80) COLLATE pg_catalog."default" NOT NULL,
+    type character(12) COLLATE pg_catalog."default" NOT NULL DEFAULT 'UNDECIDED'::bpchar,
+    pub_id character(4) COLLATE pg_catalog."default",
+    price money,
+    advance money,
+    royalty integer,
+    ytd_sales integer,
+    notes character varying(200) COLLATE pg_catalog."default",
+    pubdate timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT titles_pkey PRIMARY KEY (title_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.titles
+    OWNER to postgres;
